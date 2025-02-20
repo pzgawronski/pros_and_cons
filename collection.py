@@ -1,5 +1,6 @@
 import tabulate as tab
 from elements import Element, Pro, Con
+
 class Collection:
 
     def __init__(self, title):
@@ -11,18 +12,17 @@ class Collection:
 
     def __str__(self):
         element_headers = ["Title", "Rating", "Comment"]
-        collection_headers = ["PROS", "CONS"]
 
         display_pros = [[pro.title, pro.rating, pro.comment] for pro in self.pros]
         display_cons = [[con.title, con.rating, con.comment] for con in self.cons]
 
-        tab_pros = tab.tabulate(display_pros, headers=element_headers)
-        print(tab_pros)
-        tab_cons = tab.tabulate(display_cons, headers=element_headers)
-        print(tab_cons)
+        tab_pros = tab.tabulate(display_pros, headers=element_headers, tablefmt="rst")
+        tab_cons = tab.tabulate(display_cons, headers=element_headers, tablefmt="rst")
 
-        # This doesn't work
-        tab_total = tab.tabulate([tab_pros, tab_cons], headers=collection_headers)
+        tab_total = f"PROS\n" \
+                    f"{tab_pros}\n" \
+                    f"CONS\n" \
+                    f"{tab_cons}\n"
 
         return tab_total
 
@@ -35,9 +35,26 @@ class Collection:
     def add_con(self, con: Con):
         self._add_element(con, self.cons)
 
+    def _get_partial_score(self, elements: list[Element]):
+        partial_rating = 0
+        for element in elements:
+            print(element)
+            print(element.rating)
+            partial_rating += element.rating
+
+        return partial_rating
+
+    def _get_pro_score(self):
+        return self._get_partial_score(self.pros)
+
+    def _get_con_score(self):
+        return self._get_partial_score(self.cons)
+
     def get_score(self) -> float:
-        # TO DO: Calculate the weighed pro/con balance based on the number of pros/cons and their .rating attribute
-        return 0.0
+        pro_score = self._get_pro_score()
+        con_score = self._get_con_score()
+        return pro_score-con_score
+
 
 if __name__ == "__main__":
     test_pro = Pro("test_pro_2", rating=2)
@@ -48,3 +65,6 @@ if __name__ == "__main__":
     test_collection.add_con(test_con)
 
     print(test_collection)
+
+    print(test_collection.get_score())
+
